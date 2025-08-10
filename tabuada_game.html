@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio da Tabuada</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background-color: #f2f8ff;
+    }
+    h1 {
+        color: #2a4d69;
+    }
+    #game {
+        margin-top: 30px;
+    }
+    .question {
+        font-size: 2em;
+        margin-bottom: 20px;
+    }
+    input {
+        padding: 10px;
+        font-size: 1.2em;
+        width: 100px;
+        text-align: center;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 1em;
+        background-color: #4cafef;
+        color: white;
+        border: none;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #3b8ddb;
+    }
+    #score, #timer {
+        font-size: 1.2em;
+        margin: 10px;
+    }
+</style>
+</head>
+<body>
+
+<h1>🎯 Desafio da Tabuada</h1>
+<p>Responda o máximo que conseguir em 60 segundos!</p>
+<div id="game">
+    <div id="score">Pontos: 0</div>
+    <div id="timer">Tempo: 60</div>
+    <div class="question" id="question"></div>
+    <input type="number" id="answer" placeholder="Resposta" autofocus>
+    <br>
+    <button onclick="checkAnswer()">Responder</button>
+</div>
+
+<script>
+    let score = 0;
+    let timeLeft = 60;
+    let num1, num2;
+
+    function generateQuestion() {
+        const tables = [3, 4];
+        num1 = tables[Math.floor(Math.random() * tables.length)];
+        num2 = Math.floor(Math.random() * 10) + 1;
+        document.getElementById('question').textContent = `${num1} × ${num2} = ?`;
+        document.getElementById('answer').value = '';
+        document.getElementById('answer').focus();
+    }
+
+    function checkAnswer() {
+        let answer = parseInt(document.getElementById('answer').value);
+        if (answer === num1 * num2) {
+            score++;
+            document.getElementById('score').textContent = `Pontos: ${score}`;
+        }
+        generateQuestion();
+    }
+
+    function countdown() {
+        let timerInterval = setInterval(() => {
+            timeLeft--;
+            document.getElementById('timer').textContent = `Tempo: ${timeLeft}`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById('game').innerHTML = `<h2>⏳ Tempo esgotado!</h2><p>Sua pontuação final: <strong>${score}</strong></p>`;
+            }
+        }, 1000);
+    }
+
+    // Inicialização
+    generateQuestion();
+    countdown();
+</script>
+
+</body>
+</html>
