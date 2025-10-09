@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Mental 2.0: Novos Desafios</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .emoji-header {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-around;
+            border-bottom: 3px solid #e9ecef;
+            font-weight: bold;
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            color: #4ecdc4;
+            font-weight: bold;
+        }
+        
+        .game-area {
+            padding: 30px;
+            min-height: 400px;
+        }
+        
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #ff6b6b;
+        }
+        
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .question-type {
+            background: #4ecdc4;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .question-text {
+            font-size: 1.4rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: #333;
+        }
+        
+        .question-text .highlight {
+            background: #fff3cd;
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background: white;
+            border: 3px solid #4ecdc4;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .option:hover {
+            background: #e0f7fa;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .option.correct {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        
+        .option.incorrect {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+        
+        .option.selected {
+            background: #4ecdc4;
+            color: white;
+        }
+        
+        .hint-area {
+            background: #e0f7fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .hint-title {
+            font-weight: bold;
+            color: #00695c;
+            margin-bottom: 8px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 3px solid #e9ecef;
+        }
+        
+        .btn {
+            background: linear-gradient(to right, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .hint-btn {
+            background: linear-gradient(to right, #ff6b6b, #ff8e8e);
+        }
+        
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .celebration-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+        }
+        
+        .celebration-emoji {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+        
+        .timer {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-text {
+                font-size: 1.2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        .thinking-time {
+            font-style: italic;
+            color: #666;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="emoji-header">🚀🧩🎯</div>
+            <h1>Desafio Mental 2.0</h1>
+            <div class="subtitle">Novos 20 Desafios - Preparem seus cérebros!</div>
+        </header>
+        
+        <div class="stats-bar">
+            <div class="stat">
+                <div class="stat-number" id="current-question">1</div>
+                <div>Desafio</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="score">0</div>
+                <div>Pontos</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="streak">0</div>
+                <div>Sequência</div>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress" id="progress-bar"></div>
+        </div>
+        
+        <div class="game-area" id="game-area">
+            <!-- Conteúdo do jogo será inserido aqui -->
+        </div>
+        
+        <div class="controls">
+            <button class="btn hint-btn" id="hint-btn">💡 Dica</button>
+            <div class="timer" id="timer">Tempo: 0s</div>
+            <button class="btn" id="next-btn">Próximo →</button>
+        </div>
+    </div>
+
+    <div class="celebration" id="celebration">
+        <div class="celebration-content">
+            <div class="celebration-emoji" id="celebration-emoji">🎉</div>
+            <h2 id="celebration-title">Parabéns!</h2>
+            <p id="celebration-message">Você acertou!</p>
+            <button class="btn" onclick="closeCelebration()">Continuar</button>
+        </div>
+    </div>
+
+    <script>
+        // NOVOS 20 DESAFIOS - Versão 2.0
+        const challenges = [
+            {
+                type: "🔢 Matemática Criativa",
+                question: "Se 3 amigos querem dividir 12 chocolates igualmente, quantos cada um ganha?",
+                options: ["3 chocolates", "4 chocolates", "5 chocolates", "6 chocolates"],
+                correct: 1,
+                hint: "12 ÷ 3 = ? É uma divisão simples!"
+            },
+            {
+                type: "🎯 Raciocínio Lógico", 
+                question: "Qual é o próximo número: 2, 4, 8, 16, ___?",
+                options: ["24", "32", "30", "28"],
+                correct: 1,
+                hint: "Cada número está sendo multiplicado por 2: 2×2=4, 4×2=8..."
+            },
+            {
+                type: "🧮 Operações Mistas",
+                question: "Quanto é (10 + 5) × 2 - 8?",
+                options: ["22", "24", "26", "28"],
+                correct: 0,
+                hint: "Primeiro resolva os parênteses: 10+5=15, depois ×2=30, depois -8=22"
+            },
+            {
+                type: "💡 Pensamento Lateral",
+                question: "O que quanto mais você tira, maior fica?",
+                options: ["Um buraco", "Um número", "Um bolo", "Uma conta"],
+                correct: 0,
+                hint: "Pense em algo físico... quando você remove terra, o que acontece?"
+            },
+            {
+                type: "📊 Porcentagem",
+                question: "Se um video game custa R$ 200 com 25% de desconto, qual era o preço original?",
+                options: ["R$ 250", "R$ 266", "R$ 240", "R$ 220"],
+                correct: 1,
+                hint: "R$ 200 é 75% do preço original. Então preço original = 200 ÷ 0,75"
+            },
+            {
+                type: "🎲 Probabilidade",
+                question: "Qual a chance de tirar um ímpar ao jogar um dado?",
+                options: ["1/2", "1/3", "2/3", "1/6"],
+                correct: 0,
+                hint: "Números ímpares no dado: 1, 3, 5 → 3 em 6 possibilidades = 1/2"
+            },
+            {
+                type: "🧩 Quebra-Cabeça",
+                question: "Um número somado com ele mesmo é igual a 18. Qual é esse número?",
+                options: ["8", "9", "10", "12"],
+                correct: 1,
+                hint: "Se o número é X, então X + X = 2X = 18"
+            },
+            {
+                type: "⚡ Velocidade Mental",
+                question: "Quanto é 15 × 4 ÷ 2?",
+                options: ["20", "25", "30", "35"],
+                correct: 2,
+                hint: "15 × 4 = 60, depois 60 ÷ 2 = 30"
+            },
+            {
+                type: "🔍 Observação",
+                question: "Quantos lados tem um cubo?",
+                options: ["4 lados", "6 lados", "8 lados", "12 lados"],
+                correct: 1,
+                hint: "Pense em um dado comum... quantas faces ele tem?"
+            },
+            {
+                type: "📐 Geometria Básica",
+                question: "Se um quadrado tem lado de 5cm, qual é sua área?",
+                options: ["20 cm²", "25 cm²", "30 cm²", "35 cm²"],
+                correct: 1,
+                hint: "Área do quadrado = lado × lado = 5 × 5"
+            },
+            {
+                type: "💭 Desafio Prático",
+                question: "Se você economiza R$ 10 por semana, quanto terá em 2 meses?",
+                options: ["R$ 60", "R$ 80", "R$ 100", "R$ 120"],
+                correct: 1,
+                hint: "2 meses = 8 semanas. 8 × R$ 10 = ?"
+            },
+            {
+                type: "🎨 Padrões Visuais",
+                question: "Se 🔴 + 🔴 = 4 e 🔴 + 🔵 = 5, quanto vale 🔵?",
+                options: ["1", "2", "3", "4"],
+                correct: 2,
+                hint: "Se 🔴 + 🔴 = 4, então 🔴 = 2. Logo 2 + 🔵 = 5"
+            },
+            {
+                type: "🧮 Frações",
+                question: "Quanto é 1/2 + 1/4?",
+                options: ["1/6", "2/6", "3/4", "2/4"],
+                correct: 2,
+                hint: "1/2 = 2/4. Então 2/4 + 1/4 = 3/4"
+            },
+            {
+                type: "🚀 Raciocínio Avançado",
+                question: "Se A = 2, B = 4, C = 6, quanto é A × B + C?",
+                options: ["12", "14", "16", "18"],
+                correct: 1,
+                hint: "2 × 4 = 8, depois 8 + 6 = 14"
+            },
+            {
+                type: "💰 Matemática Financeira",
+                question: "Se um produto custa R$ 80 e tem 10% de desconto, qual o novo preço?",
+                options: ["R$ 70", "R$ 72", "R$ 74", "R$ 76"],
+                correct: 1,
+                hint: "10% de R$ 80 = R$ 8. Então R$ 80 - R$ 8 = R$ 72"
+            },
+            {
+                type: "🎯 Lógica Numérica",
+                question: "Qual número é igual a sua metade mais 10?",
+                options: ["15", "20", "25", "30"],
+                correct: 1,
+                hint: "Se o número é X, então X = X/2 + 10. Resolva a equação!"
+            },
+            {
+                type: "🔢 Potências",
+                question: "Quanto é 4³?",
+                options: ["12", "16", "64", "48"],
+                correct: 2,
+                hint: "4³ = 4 × 4 × 4 = 16 × 4 = 64"
+            },
+            {
+                type: "🧠 Memória Matemática",
+                question: "Quanto é 9 × 7?",
+                options: ["56", "63", "72", "81"],
+                correct: 1,
+                hint: "Lembre-se da tabuada do 9: 9×7=63"
+            },
+            {
+                type: "📅 Raciocínio Temporal",
+                question: "Se hoje é segunda-feira, que dia será em 15 dias?",
+                options: ["Terça", "Quarta", "Quinta", "Sexta"],
+                correct: 0,
+                hint: "15 dias = 2 semanas (14 dias) + 1 dia. Segunda + 1 dia = Terça"
+            },
+            {
+                type: "🏆 Desafio Final",
+                question: "Um número multiplicado por 3 e depois somado com 5 resulta em 20. Qual é esse número?",
+                options: ["3", "4", "5", "6"],
+                correct: 2,
+                hint: "Se o número é X, então 3X + 5 = 20. Resolva: 3X = 15, então X = 5"
+            }
+        ];
+
+        // Variáveis do jogo
+        let currentChallenge = 0;
+        let score = 0;
+        let streak = 0;
+        let startTime;
+        let timerInterval;
+        let selectedAnswer = null;
+
+        // Elementos DOM
+        const gameArea = document.getElementById('game-area');
+        const currentQuestionElement = document.getElementById('current-question');
+        const scoreElement = document.getElementById('score');
+        const streakElement = document.getElementById('streak');
+        const hintBtn = document.getElementById('hint-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const timerElement = document.getElementById('timer');
+        const progressBar = document.getElementById('progress-bar');
+        const celebration = document.getElementById('celebration');
+        const celebrationTitle = document.getElementById('celebration-title');
+        const celebrationMessage = document.getElementById('celebration-message');
+        const celebrationEmoji = document.getElementById('celebration-emoji');
+
+        // Iniciar o jogo
+        function startGame() {
+            startTime = new Date();
+            timerInterval = setInterval(updateTimer, 1000);
+            updateProgressBar();
+            loadChallenge();
+        }
+
+        // Atualizar timer
+        function updateTimer() {
+            const currentTime = new Date();
+            const elapsed = Math.floor((currentTime - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = elapsed % 60;
+            timerElement.textContent = `Tempo: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Atualizar barra de progresso
+        function updateProgressBar() {
+            const progress = ((currentChallenge) / challenges.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Carregar desafio atual
+        function loadChallenge() {
+            const challenge = challenges[currentChallenge];
+            
+            gameArea.innerHTML = `
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-type">${challenge.type}</div>
+                        <div>Desafio ${currentChallenge + 1} de ${challenges.length}</div>
+                    </div>
+                    <div class="question-text">${challenge.question}</div>
+                    <div class="options-grid">
+                        ${challenge.options.map((option, index) => `
+                            <div class="option ${selectedAnswer === index ? 'selected' : ''}" 
+                                 onclick="selectAnswer(${index})">
+                                ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="hint-area" id="hint-area">
+                        <div class="hint-title">💡 Dica:</div>
+                        <div>${challenge.hint}</div>
+                    </div>
+                    <div class="thinking-time">"Pensem juntos! A união faz a força! 🤝"</div>
+                </div>
+            `;
+            
+            currentQuestionElement.textContent = currentChallenge + 1;
+            updateButtons();
+        }
+
+        // Selecionar resposta
+        function selectAnswer(index) {
+            if (selectedAnswer !== null) return;
+            
+            selectedAnswer = index;
+            const challenge = challenges[currentChallenge];
+            const isCorrect = index === challenge.correct;
+            
+            // Atualizar visual da opção selecionada
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => option.classList.remove('selected'));
+            options[index].classList.add('selected');
+            
+            if (isCorrect) {
+                options[index].classList.add('correct');
+                score += 10;
+                streak++;
+                showCelebration(true, streak);
+            } else {
+                options[index].classList.add('incorrect');
+                // Mostrar a resposta correta
+                options[challenge.correct].classList.add('correct');
+                streak = 0;
+                showCelebration(false, 0);
+            }
+            
+            scoreElement.textContent = score;
+            streakElement.textContent = streak;
+            updateButtons();
+        }
+
+        // Mostrar celebração
+        function showCelebration(isCorrect, currentStreak) {
+            if (isCorrect) {
+                if (currentStreak >= 5) {
+                    celebrationTitle.textContent = "🤯 INCRÍVEL!";
+                    celebrationMessage.textContent = `Sequência de ${currentStreak} acertos! Vocês são gênios!`;
+                    celebrationEmoji.textContent = "🚀";
+                } else if (currentStreak >= 3) {
+                    celebrationTitle.textContent = "🔥 FANTÁSTICO!";
+                    celebrationMessage.textContent = `Sequência de ${currentStreak} acertos! Continuem assim!`;
+                    celebrationEmoji.textContent = "⭐";
+                } else {
+                    celebrationTitle.textContent = "🎉 ACERTOU!";
+                    celebrationMessage.textContent = "Bom trabalho! O raciocínio de vocês está afiado!";
+                    celebrationEmoji.textContent = "👍";
+                }
+            } else {
+                celebrationTitle.textContent = "💡 QUASE LÁ!";
+                celebrationMessage.textContent = "Não desanimem! Discutam a resposta e tentem novamente!";
+                celebrationEmoji.textContent = "📚";
+            }
+            celebration.style.display = 'flex';
+        }
+
+        // Fechar celebração
+        function closeCelebration() {
+            celebration.style.display = 'none';
+        }
+
+        // Mostrar dica
+        function showHint() {
+            const hintArea = document.getElementById('hint-area');
+            hintArea.style.display = 'block';
+            hintBtn.disabled = true;
+        }
+
+        // Próximo desafio
+        function nextChallenge() {
+            selectedAnswer = null;
+            currentChallenge++;
+            updateProgressBar();
+            
+            if (currentChallenge >= challenges.length) {
+                endGame();
+            } else {
+                loadChallenge();
+            }
+        }
+
+        // Finalizar jogo
+        function endGame() {
+            clearInterval(timerInterval);
+            const finalTime = timerElement.textContent;
+            const percentage = Math.round((score / (challenges.length * 10)) * 100);
+            
+            let performanceMessage = "";
+            let finalEmoji = "";
+            
+            if (percentage >= 90) {
+                performanceMessage = "🏆 MENTES BRILHANTES! Vocês dominaram todos os desafios!";
+                finalEmoji = "🤩";
+            } else if (percentage >= 70) {
+                performanceMessage = "🎯 EXCELENTE TRABALHO EM EQUIPE! Raciocínio muito afiado!";
+                finalEmoji = "😎";
+            } else if (percentage >= 50) {
+                performanceMessage = "👏 BOA JORNADA! Continuem praticando que vão longe!";
+                finalEmoji = "👍";
+            } else {
+                performanceMessage = "💪 ÓTIMO ESFORÇO! Cada desafio os torna mais fortes!";
+                finalEmoji = "💪";
+            }
+            
+            gameArea.innerHTML = `
+                <div class="question-card" style="text-align: center;">
+                    <div class="emoji-header">${finalEmoji} 🏅 ✨</div>
+                    <h2>Missão Concluída!</h2>
+                    <p style="font-size: 1.3rem; margin: 20px 0;">Vocês venceram os 20 novos desafios!</p>
+                    <div style="font-size: 2.5rem; color: #4ecdc4; font-weight: bold; margin: 20px 0;">
+                        ${score}/200 pontos
+                    </div>
+                    <div style="font-size: 1.5rem; color: #ff6b6b; margin: 15px 0;">
+                        ${percentage}% de acertos
+                    </div>
+                    <p style="margin: 15px 0; font-size: 1.1rem;">${finalTime}</p>
+                    <p style="margin: 20px 0; padding: 15px; background: #e0f7fa; border-radius: 10px; font-weight: bold;">
+                        ${performanceMessage}
+                    </p>
+                    <p style="font-style: italic; color: #666; margin-top: 20px;">
+                        "Sozinhos vamos mais rápido, mas juntos vamos mais longe."<br>- Provérbio Africano
+                    </p>
+                    <button class="btn" onclick="restartGame()" style="margin-top: 25px; padding: 15px 30px;">Jogar Novamente</button>
+                </div>
+            `;
+            nextBtn.style.display = 'none';
+            hintBtn.style.display = 'none';
+        }
+
+        // Reiniciar jogo
+        function restartGame() {
+            currentChallenge = 0;
+            score = 0;
+            streak = 0;
+            selectedAnswer = null;
+            scoreElement.textContent = '0';
+            streakElement.textContent = '0';
+            nextBtn.style.display = 'block';
+            hintBtn.style.display = 'block';
+            hintBtn.disabled = false;
+            startGame();
+        }
+
+        // Atualizar botões
+        function updateButtons() {
+            nextBtn.disabled = selectedAnswer === null;
+            hintBtn.disabled = selectedAnswer !== null;
+        }
+
+        // Event listeners
+        hintBtn.addEventListener('click', showHint);
+        nextBtn.addEventListener('click', nextChallenge);
+
+        // Iniciar o jogo
+        startGame();
+    </script>
+</body>
+</html>
