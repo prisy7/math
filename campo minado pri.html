@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campo Minado da Pri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        
+        .container {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            color: #ffcc00;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+        
+        .controls {
+            margin-bottom: 20px;
+        }
+        
+        button {
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            border: none;
+            border-radius: 50px;
+            color: #1a2a6c;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0 #cc7a00;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 0 #cc7a00;
+        }
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #cc7a00;
+        }
+        
+        .difficulty {
+            margin-top: 15px;
+        }
+        
+        select {
+            background-color: #1a2a6c;
+            color: white;
+            border: 2px solid #ffcc00;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 1rem;
+            margin: 0 5px;
+        }
+        
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 5px;
+            margin: 0 auto;
+            max-width: 450px;
+        }
+        
+        .cell {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(to bottom, #4a6fc1, #2a4a9c);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 3px 0 #1a2a6c;
+            user-select: none;
+        }
+        
+        .cell:hover {
+            background: linear-gradient(to bottom, #5a7fd1, #3a5aac);
+        }
+        
+        .cell.revealed {
+            background: linear-gradient(to bottom, #e0e0e0, #c0c0c0);
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
+            color: #333;
+        }
+        
+        .cell.flag::before {
+            content: "🚩";
+        }
+        
+        .cell.bomb::before {
+            content: "💣";
+        }
+        
+        .cell.pri {
+            font-size: 1.6rem;
+        }
+        
+        .cell-1 { color: blue; }
+        .cell-2 { color: green; }
+        .cell-3 { color: red; }
+        .cell-4 { color: darkblue; }
+        .cell-5 { color: darkred; }
+        .cell-6 { color: teal; }
+        .cell-7 { color: black; }
+        .cell-8 { color: gray; }
+        
+        .message {
+            margin-top: 20px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-height: 40px;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .win {
+            color: #4cff00;
+            text-shadow: 0 0 10px #4cff00;
+        }
+        
+        .lose {
+            color: #ff3300;
+            text-shadow: 0 0 10px #ff3300;
+        }
+        
+        .instructions {
+            margin-top: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #ffcc00;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .pri-emoji {
+            font-size: 1.8rem;
+            vertical-align: middle;
+        }
+        
+        @media (max-width: 500px) {
+            .cell {
+                width: 30px;
+                height: 30px;
+                font-size: 0.9rem;
+            }
+            
+            .cell.pri {
+                font-size: 1.3rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Campo Minado da Pri</h1>
+        
+        <div class="game-info">
+            <div class="bombs">Bombas: <span id="bomb-count">10</span></div>
+            <div class="flags">Bandeiras: <span id="flag-count">0</span></div>
+            <div class="pris">Pris: <span id="pri-count">0</span>/<span id="total-pris">3</span></div>
+            <div class="timer">Tempo: <span id="timer">0</span>s</div>
+        </div>
+        
+        <div class="controls">
+            <button id="new-game">Novo Jogo</button>
+            <button id="hint">Dica</button>
+            <div class="difficulty">
+                <label for="difficulty">Dificuldade:</label>
+                <select id="difficulty">
+                    <option value="easy">Fácil (9x9, 10 bombas)</option>
+                    <option value="medium">Médio (12x12, 25 bombas)</option>
+                    <option value="hard">Difícil (15x15, 45 bombas)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="game-board" id="game-board"></div>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="instructions">
+            <h3>Como Jogar:</h3>
+            <ul>
+                <li>Clique em uma célula para revelá-la</li>
+                <li>Clique com o botão direito para colocar/remover uma bandeira</li>
+                <li>Encontre todas as células seguras sem acertar as bombas</li>
+                <li>Os números indicam quantas bombas há nas células vizinhas</li>
+                <li><span class="pri-emoji">🙋🏻‍♀️</span> representa a Pri - encontre todas as carinhas da professora!</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Elementos de áudio para os sons personalizados -->
+    <audio id="win-sound" preload="auto">
+        <source src="https://github.com/prisy7/math/raw/main/bicomp4.mp4" type="audio/mp4">
+    </audio>
+    <audio id="lose-sound" preload="auto">
+        <source src="https://github.com/prisy7/math/raw/main/xiimp4.mp4" type="audio/mp4">
+    </audio>
+    <audio id="pri-sound" preload="auto">
+        <source src="https://github.com/prisy7/math/raw/main/heymp4.mp4" type="audio/mp4">
+    </audio>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Elementos do DOM
+            const gameBoard = document.getElementById('game-board');
+            const bombCountElement = document.getElementById('bomb-count');
+            const flagCountElement = document.getElementById('flag-count');
+            const priCountElement = document.getElementById('pri-count');
+            const totalPrisElement = document.getElementById('total-pris');
+            const timerElement = document.getElementById('timer');
+            const messageElement = document.getElementById('message');
+            const newGameButton = document.getElementById('new-game');
+            const hintButton = document.getElementById('hint');
+            const difficultySelect = document.getElementById('difficulty');
+            
+            // Elementos de áudio
+            const winSound = document.getElementById('win-sound');
+            const loseSound = document.getElementById('lose-sound');
+            const priSound = document.getElementById('pri-sound');
+            
+            // Configurações do jogo
+            let boardSize = 9;
+            let bombCount = 10;
+            let priCount = 3;
+            let board = [];
+            let revealedCount = 0;
+            let flaggedCount = 0;
+            let prisFound = 0;
+            let gameOver = false;
+            let gameStarted = false;
+            let timerInterval;
+            let seconds = 0;
+            
+            // Sons (usando Web Audio API)
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            function playSound(frequency, duration, type = 'sine') {
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+                
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = frequency;
+                oscillator.type = type;
+                
+                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            }
+            
+            // Tocar som personalizado
+            function playCustomSound(soundElement) {
+                try {
+                    soundElement.currentTime = 0;
+                    soundElement.play().catch(e => console.log('Erro ao tocar som:', e));
+                } catch (e) {
+                    console.log('Erro ao tocar som:', e);
+                }
+            }
+            
+            // Inicializar o jogo
+            function initGame() {
+                // Parar o temporizador atual
+                clearInterval(timerInterval);
+                seconds = 0;
+                timerElement.textContent = seconds;
+                
+                // Reiniciar variáveis do jogo
+                board = [];
+                revealedCount = 0;
+                flaggedCount = 0;
+                prisFound = 0;
+                gameOver = false;
+                gameStarted = false;
+                messageElement.textContent = '';
+                messageElement.className = 'message';
+                
+                // Atualizar contadores
+                flagCountElement.textContent = flaggedCount;
+                bombCountElement.textContent = bombCount;
+                priCountElement.textContent = prisFound;
+                totalPrisElement.textContent = priCount;
+                
+                // Criar o tabuleiro vazio
+                gameBoard.innerHTML = '';
+                gameBoard.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+                
+                for (let i = 0; i < boardSize; i++) {
+                    board[i] = [];
+                    for (let j = 0; j < boardSize; j++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'cell';
+                        cell.dataset.row = i;
+                        cell.dataset.col = j;
+                        
+                        // Evento de clique esquerdo
+                        cell.addEventListener('click', () => revealCell(i, j));
+                        
+                        // Evento de clique direito (bandeira)
+                        cell.addEventListener('contextmenu', (e) => {
+                            e.preventDefault();
+                            toggleFlag(i, j);
+                        });
+                        
+                        gameBoard.appendChild(cell);
+                        board[i][j] = {
+                            isBomb: false,
+                            isRevealed: false,
+                            isFlagged: false,
+                            isPri: false,
+                            value: 0,
+                            element: cell
+                        };
+                    }
+                }
+                
+                // Posicionar bombas e carinhas da Pri
+                placeBombs();
+                calculateNumbers();
+                
+                // Adicionar carinhas da Pri (células especiais)
+                placePris();
+            }
+            
+            // Posicionar bombas aleatoriamente
+            function placeBombs() {
+                let bombsPlaced = 0;
+                
+                while (bombsPlaced < bombCount) {
+                    const row = Math.floor(Math.random() * boardSize);
+                    const col = Math.floor(Math.random() * boardSize);
+                    
+                    if (!board[row][col].isBomb) {
+                        board[row][col].isBomb = true;
+                        bombsPlaced++;
+                    }
+                }
+            }
+            
+            // Calcular números nas células (quantas bombas vizinhas)
+            function calculateNumbers() {
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (!board[i][j].isBomb) {
+                            let count = 0;
+                            
+                            // Verificar todas as 8 células vizinhas
+                            for (let di = -1; di <= 1; di++) {
+                                for (let dj = -1; dj <= 1; dj++) {
+                                    const ni = i + di;
+                                    const nj = j + dj;
+                                    
+                                    if (ni >= 0 && ni < boardSize && nj >= 0 && nj < boardSize) {
+                                        if (board[ni][nj].isBomb) {
+                                            count++;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            board[i][j].value = count;
+                        }
+                    }
+                }
+            }
+            
+            // Adicionar carinhas da Pri
+            function placePris() {
+                let prisPlaced = 0;
+                
+                while (prisPlaced < priCount) {
+                    const row = Math.floor(Math.random() * boardSize);
+                    const col = Math.floor(Math.random() * boardSize);
+                    
+                    if (!board[row][col].isBomb && board[row][col].value === 0) {
+                        board[row][col].isPri = true;
+                        prisPlaced++;
+                    }
+                }
+            }
+            
+            // Revelar uma célula
+            function revealCell(row, col) {
+                if (gameOver || board[row][col].isRevealed || board[row][col].isFlagged) {
+                    return;
+                }
+                
+                // Iniciar o jogo e o temporizador na primeira jogada
+                if (!gameStarted) {
+                    gameStarted = true;
+                    startTimer();
+                }
+                
+                const cell = board[row][col];
+                cell.isRevealed = true;
+                cell.element.classList.add('revealed');
+                revealedCount++;
+                
+                // Tocar som baseado no conteúdo da célula
+                if (cell.isBomb) {
+                    // Jogo perdido
+                    cell.element.classList.add('bomb');
+                    playSound(150, 0.5, 'square');
+                    gameOver = true;
+                    revealAllBombs();
+                    messageElement.textContent = '💥 Você perdeu! Pris encontradas: ' + prisFound + '/' + priCount;
+                    messageElement.classList.add('lose');
+                    clearInterval(timerInterval);
+                    
+                    // Tocar som de derrota personalizado
+                    playCustomSound(loseSound);
+                } else if (cell.isPri) {
+                    // Pri encontrada
+                    cell.element.textContent = '🙋🏻‍♀️';
+                    cell.element.classList.add('pri');
+                    
+                    prisFound++;
+                    priCountElement.textContent = prisFound;
+                    
+                    // Tocar som personalizado da Pri
+                    playCustomSound(priSound);
+                    
+                    // Som especial para Pri (mantendo os sons originais também)
+                    playSound(800, 0.3, 'sine');
+                    playSound(1000, 0.3, 'sine');
+                    playSound(1200, 0.3, 'sine');
+                    
+                    // Mensagem de Pri encontrada
+                    if (prisFound < priCount) {
+                        messageElement.textContent = '🙋🏻‍♀️ Você encontrou a Pri! Continue procurando!';
+                        setTimeout(() => {
+                            if (!gameOver) messageElement.textContent = '';
+                        }, 2000);
+                    }
+                    
+                    if (cell.value > 0) {
+                        const numberElement = document.createElement('span');
+                        numberElement.textContent = cell.value;
+                        numberElement.classList.add(`cell-${cell.value}`);
+                        numberElement.style.position = 'absolute';
+                        numberElement.style.fontSize = '0.8rem';
+                        numberElement.style.marginTop = '-15px';
+                        cell.element.appendChild(numberElement);
+                    }
+                } else if (cell.value > 0) {
+                    // Célula com número
+                    cell.element.textContent = cell.value;
+                    cell.element.classList.add(`cell-${cell.value}`);
+                    playSound(300 + (cell.value * 50), 0.2, 'sine');
+                } else {
+                    // Célula vazia - revelar recursivamente as células vizinhas
+                    playSound(200, 0.1, 'sine');
+                    revealAdjacentCells(row, col);
+                }
+                
+                // Verificar vitória
+                if (revealedCount === boardSize * boardSize - bombCount) {
+                    gameOver = true;
+                    let victoryMessage = '🎉 Parabéns! Você venceu!';
+                    
+                    if (prisFound === priCount) {
+                        victoryMessage += ' E encontrou todas as Pris! 🏆';
+                    } else {
+                        victoryMessage += ' Pris encontradas: ' + prisFound + '/' + priCount;
+                    }
+                    
+                    messageElement.textContent = victoryMessage;
+                    messageElement.classList.add('win');
+                    clearInterval(timerInterval);
+                    
+                    // Tocar som de vitória personalizado
+                    playCustomSound(winSound);
+                    
+                    // Manter os sons originais também
+                    playSound(523, 0.2, 'sine');
+                    playSound(659, 0.2, 'sine');
+                    playSound(784, 0.2, 'sine');
+                    playSound(1047, 0.5, 'sine');
+                }
+            }
+            
+            // Revelar células adjacentes recursivamente
+            function revealAdjacentCells(row, col) {
+                for (let di = -1; di <= 1; di++) {
+                    for (let dj = -1; dj <= 1; dj++) {
+                        const ni = row + di;
+                        const nj = col + dj;
+                        
+                        if (ni >= 0 && ni < boardSize && nj >= 0 && nj < boardSize) {
+                            if (!board[ni][nj].isRevealed && !board[ni][nj].isFlagged && !board[ni][nj].isBomb) {
+                                board[ni][nj].isRevealed = true;
+                                board[ni][nj].element.classList.add('revealed');
+                                revealedCount++;
+                                
+                                if (board[ni][nj].isPri) {
+                                    board[ni][nj].element.textContent = '🙋🏻‍♀️';
+                                    board[ni][nj].element.classList.add('pri');
+                                    
+                                    prisFound++;
+                                    priCountElement.textContent = prisFound;
+                                    
+                                    // Tocar som personalizado da Pri
+                                    playCustomSound(priSound);
+                                    
+                                    playSound(800, 0.2, 'sine');
+                                } else if (board[ni][nj].value > 0) {
+                                    board[ni][nj].element.textContent = board[ni][nj].value;
+                                    board[ni][nj].element.classList.add(`cell-${board[ni][nj].value}`);
+                                } else {
+                                    // Se for célula vazia, continuar revelando recursivamente
+                                    revealAdjacentCells(ni, nj);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Alternar bandeira em uma célula
+            function toggleFlag(row, col) {
+                if (gameOver || board[row][col].isRevealed) {
+                    return;
+                }
+                
+                const cell = board[row][col];
+                
+                if (cell.isFlagged) {
+                    cell.isFlagged = false;
+                    cell.element.classList.remove('flag');
+                    flaggedCount--;
+                    playSound(300, 0.1, 'sine');
+                } else {
+                    cell.isFlagged = true;
+                    cell.element.classList.add('flag');
+                    flaggedCount++;
+                    playSound(500, 0.1, 'sine');
+                }
+                
+                flagCountElement.textContent = flaggedCount;
+            }
+            
+            // Revelar todas as bombas (quando o jogo termina)
+            function revealAllBombs() {
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (board[i][j].isBomb) {
+                            board[i][j].element.classList.add('revealed', 'bomb');
+                        }
+                    }
+                }
+            }
+            
+            // Iniciar o temporizador
+            function startTimer() {
+                clearInterval(timerInterval);
+                seconds = 0;
+                timerElement.textContent = seconds;
+                
+                timerInterval = setInterval(() => {
+                    seconds++;
+                    timerElement.textContent = seconds;
+                }, 1000);
+            }
+            
+            // Fornecer uma dica
+            function provideHint() {
+                if (gameOver || !gameStarted) return;
+                
+                // Encontrar uma célula segura não revelada
+                const safeCells = [];
+                
+                for (let i = 0; i < boardSize; i++) {
+                    for (let j = 0; j < boardSize; j++) {
+                        if (!board[i][j].isRevealed && !board[i][j].isBomb && !board[i][j].isFlagged) {
+                            safeCells.push({row: i, col: j});
+                        }
+                    }
+                }
+                
+                if (safeCells.length > 0) {
+                    const hint = safeCells[Math.floor(Math.random() * safeCells.length)];
+                    
+                    // Piscar a célula de dica
+                    const cell = board[hint.row][hint.col].element;
+                    const originalTransform = cell.style.transform;
+                    const originalBoxShadow = cell.style.boxShadow;
+                    
+                    cell.style.transform = 'scale(1.2)';
+                    cell.style.boxShadow = '0 0 15px #ffcc00';
+                    playSound(600, 0.3, 'sine');
+                    
+                    setTimeout(() => {
+                        cell.style.transform = originalTransform;
+                        cell.style.boxShadow = originalBoxShadow;
+                    }, 800);
+                } else {
+                    messageElement.textContent = 'Não há dicas disponíveis no momento!';
+                    setTimeout(() => {
+                        if (!gameOver) messageElement.textContent = '';
+                    }, 2000);
+                }
+            }
+            
+            // Alterar dificuldade
+            function changeDifficulty() {
+                const difficulty = difficultySelect.value;
+                
+                switch(difficulty) {
+                    case 'easy':
+                        boardSize = 9;
+                        bombCount = 10;
+                        priCount = 3;
+                        break;
+                    case 'medium':
+                        boardSize = 12;
+                        bombCount = 25;
+                        priCount = 5;
+                        break;
+                    case 'hard':
+                        boardSize = 15;
+                        bombCount = 45;
+                        priCount = 7;
+                        break;
+                }
+                
+                bombCountElement.textContent = bombCount;
+                totalPrisElement.textContent = priCount;
+                initGame();
+            }
+            
+            // Event listeners
+            newGameButton.addEventListener('click', initGame);
+            hintButton.addEventListener('click', provideHint);
+            difficultySelect.addEventListener('change', changeDifficulty);
+            
+            // Inicializar o jogo
+            initGame();
+        });
+    </script>
+</body>
+</html>
